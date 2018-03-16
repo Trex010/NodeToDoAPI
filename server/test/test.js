@@ -84,7 +84,7 @@ describe('GET /todos/:id', () => {
       .get(`/todos/${todoData[0]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
-        expect(res.body.text).toBe(todoData[0].text);
+        expect(res.body.todo.text).toBe(todoData[0].text);
       })
       .end(done)
   });
@@ -98,7 +98,7 @@ describe('GET /todos/:id', () => {
 
   });
 
-  it('should return 400 if id is not valid object ', (done) => {
+  it('should return 404 if id is not valid object ', (done) => {
     request(app)
       .get('get/todos/5aab7d71c505930d44dac8aa')
       .expect(404)
