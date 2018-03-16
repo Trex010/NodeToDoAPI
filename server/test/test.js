@@ -107,7 +107,7 @@ describe('GET /todos/:id', () => {
   })
 });
 
-describe('delete /todos/:id', () => {
+describe('DELETE /todos/:id', () => {
   it('should delete and return todo document', (done) => {
     request(app)
       .delete(`/todos/${todoData[1]._id.toHexString()}`)
