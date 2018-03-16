@@ -56,6 +56,25 @@ app.listen(port, () => {
   console.log(`Server is listening at port ${port}`);
 });
 
+app.delete('/todos/:id', (req, res) => {
+  //get the id
+  const id = req.params.id;
+  // validate the id  -> return 404
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send('Not found');
+  }
+  // remove todo by id
+  Todo.findByIdAndRemove(id)
+    .then((todo)=>{
+      if(!todo) {
+        return res.status(404).send('Not found');
+      }
+      return res.status(200).send({todo});
+    })
+    .catch(e => res.status(400).send(e));
+
+});
+
 module.exports = {
   app
 }
