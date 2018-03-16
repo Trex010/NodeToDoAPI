@@ -11,7 +11,9 @@ const todoData = [{
   text:'First thing'
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo'
+  text: 'Second test todo',
+  complete: false,
+  completeAt: 333
 }]
 
 beforeEach((done) => {
@@ -143,4 +145,48 @@ describe('DELETE /todos/:id', () => {
       .expect(404)
       .end(done)
   });
+});
+
+describe('PATCH /todos/:id', () => {
+  let newObject =  {
+    text: 'thien',
+    completed: true
+  }
+
+  it('should update and return todo document', (done) => {
+    request(app)
+      .patch(`/todos/${todoData[1]._id.toHexString()}`)
+      .send(newObject)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(newObject.text);
+        expect(res.body.todo.completed).toBe(newObject.completed);
+        expect(res.body.todo.completedAt).toBeA('number');
+      })
+      .end(done);
+  });
+
+  it('should update and return todo document', (done) => {
+    request(app)
+      .patch(`/todos/${todoData[1]._id.toHexString()}`)
+      .send({completed:false, text: 'thien'})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(newObject.text)
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completeAt).toNotExist();
+      })
+      .end(done);
+  });
+
+
+  it('should return 404 if id is not founds', (done) => {
+    let hexId = new ObjectID().toHexString();
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send(newObject)
+      .expect(404)
+      .end(done)
+  });
+
 });
