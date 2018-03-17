@@ -1,6 +1,5 @@
 require('./config/config');
 
-
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -58,10 +57,6 @@ app.get('/todos/:id', (req,res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Server is listening at port ${port}`);
-});
-
 app.delete('/todos/:id', (req, res) => {
   //get the id
   const id = req.params.id;
@@ -107,6 +102,11 @@ app.patch('/todos/:id', (req, res) => {
     .catch(e => res.status(400).send());
 
 });
+
+app.listen(port, () => {
+  console.log(`Server is listening at port ${port}`);
+});
+
 module.exports = {
   app
 }

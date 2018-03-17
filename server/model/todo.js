@@ -6,7 +6,7 @@ const Todo = mongoose.model('todos',{
     type: String,
     required: true,
     minlength: 1,
-    trim: true //remove stupid whitespace at the top and the endof the string
+    trim: true 
   },
   completed: {
     type: Boolean,
