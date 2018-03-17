@@ -17,6 +17,7 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
+//Todo API
 app.post('/todos', (req, res) => {
   var todo = new Todo({
     text: req.body.text
@@ -84,7 +85,6 @@ app.patch('/todos/:id', (req, res) => {
     return res.status(404).send('Not found');
   }
 
-
   if(_.isBoolean(body.completed) && body.completed){
     body.completedAt = new Date().getTime();
   } else {
@@ -102,6 +102,16 @@ app.patch('/todos/:id', (req, res) => {
     .catch(e => res.status(400).send());
 
 });
+
+//User Login API
+app.post('/users', (req, res) => {
+  let body = _.pick(req.body, ['email', 'password']);
+  let user = new User(body);
+  user.save()
+    .then(() => res.status(200).send(user))
+    .catch(e => res.status(400).send(e));
+});
+
 
 app.listen(port, () => {
   console.log(`Server is listening at port ${port}`);
