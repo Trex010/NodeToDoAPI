@@ -40,7 +40,6 @@ UserSchema.methods.toJSON = function() {
   let userObject = user.toObject();
 
   return _.pick(userObject, ['_id','email'])
-
 };
 
 UserSchema.methods.generateAuthToken = function() {
@@ -50,6 +49,22 @@ UserSchema.methods.generateAuthToken = function() {
   user.tokens = user.tokens.concat([{access, token}]);
 
   return user.save().then(() => token);
+}
+
+UserSchema.statics.findByToken = function(token) {
+  let User = this;
+  let decoded;
+  try {
+    decoded = jwt.verify(token,'abc123');
+  } catch (e) {
+    return  Promise.reject();
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  })
 }
 
 //User model
