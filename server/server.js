@@ -43,12 +43,13 @@ app.get('/todos',authenticate, (req,res) => {
   });
 })
 
-app.get('/todos/:id', (req,res) => {
-  const id = req.params.id;
-  if(!ObjectID.isValid(id)){
+app.get('/todos/:id',authenticate, (req,res) => {
+  const _id = req.params.id;
+  const _creator = req.user._id;
+  if(!ObjectID.isValid(_id)){
     return res.status(400).send("ID is not invalid");
   } else {
-    Todo.findById(id)
+    Todo.findOne({_id, _creator})
       .then((todo) => {
         if(!todo){
           throw new Error('ID is not found');
@@ -62,15 +63,16 @@ app.get('/todos/:id', (req,res) => {
   }
 })
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id',authenticate, (req, res) => {
   //get the id
-  const id = req.params.id;
+  const _id = req.params.id;
+  const _creator = req.user.id;
   // validate the id  -> return 404
-  if(!ObjectID.isValid(id)){
+  if(!ObjectID.isValid(_id)){
     return res.status(404).send('Not found');
   }
   // remove todo by id
-  Todo.findByIdAndRemove(id)
+  Todo.findOneAndRemove({_id, _creator})
     .then((todo)=>{
       if(!todo) {
         return res.status(404).send('Not found');
@@ -81,11 +83,12 @@ app.delete('/todos/:id', (req, res) => {
 
 });
 
-app.patch('/todos/:id', (req, res) => {
-  let id = req.params.id;
+app.patch('/todos/:id',authenticate, (req, res) => {
+  let _id = req.params.id;
+  let _creator = req.user._id
   let body = _.pick(req.body, ['text', 'completed']);
 
-  if(!ObjectID.isValid(id)){
+  if(!ObjectID.isValid(_id)){
     return res.status(404).send('Not found');
   }
 
@@ -96,7 +99,7 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null;
   }
 
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+  Todo.findOneAndUpdate({_id, _creator}, {$set: body}, {new: true})
     .then((todo) => {
       if(!todo){
         return res.status(404).send() ;
