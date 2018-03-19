@@ -6,7 +6,7 @@ const Todo = mongoose.model('todos',{
     type: String,
     required: true,
     minlength: 1,
-    trim: true 
+    trim: true
   },
   completed: {
     type: Boolean,
@@ -15,6 +15,10 @@ const Todo = mongoose.model('todos',{
   completedAt: {
     type: Number,
     default: null
+  },
+  _creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
 });
 

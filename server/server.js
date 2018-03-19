@@ -19,9 +19,10 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 
 //Todo API
-app.post('/todos', (req, res) => {
+app.post('/todos',authenticate, (req, res) => {
   var todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   })
 
   todo.save()
@@ -32,12 +33,14 @@ app.post('/todos', (req, res) => {
   })
 });
 
-app.get('/todos', (req,res) => {
-  Todo.find().then((todos) => {
+app.get('/todos',authenticate, (req,res) => {
+  Todo.find({
+    _creator: req.user._id
+  }).then((todos) => {
     res.status(200).send({todos})
   }, (e) => {
     res.status(400).send(e)
-  })
+  });
 })
 
 app.get('/todos/:id', (req,res) => {
@@ -104,7 +107,19 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
-//User API
+// Login API
+app.post('/users/login', (req,res) => {
+  let body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password)
+    .then(user =>{
+      return user.generateAuthToken()
+        .then(token => res.status(200).header('x-auth', token).send(user))
+    })
+    .catch(e => res.status(400).send());
+})
+
+//SignUp API
 app.post('/users', (req, res) => {
   let body = _.pick(req.body, ['email', 'password']);
   let user = new User(body);
@@ -117,18 +132,6 @@ app.post('/users', (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
-
-// Login API
-app.post('/users/login', (req,res) => {
-  let body = _.pick(req.body, ['email', 'password']);
-
-  User.findByCredentials(body.email, body.password)
-    .then(user =>{
-      return user.generateAuthToken()
-        .then(token => res.status(200).header('x-auth', token).send(user))
-    })
-    .catch(e => res.status(400).send());
-})
 
 //Logout API
 app.delete('/user/me/token',authenticate, (req, res) => {
